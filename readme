@@ -1,0 +1,141 @@
+# 🚀 EmprendeIA Backend
+
+Backend desarrollado en **.NET 8 + Clean Architecture + PostgreSQL (Docker) + JWT**.
+
+## 📦 Requisitos
+
+* .NET 8 SDK
+* Docker Desktop
+* Git
+
+Verificar instalación:
+
+```bash
+dotnet --version
+docker --version
+docker compose version
+```
+
+---
+
+## 🐳 1️⃣ Clonar el repositorio
+
+```bash
+git clone https://github.com/stfrancoc/backend_emprenderIA.git
+cd backend_emprenderIA
+```
+
+---
+
+## 🐘 2️⃣ Levantar la base de datos (Docker)
+
+Desde la raíz del proyecto:
+
+```bash
+docker compose up -d
+```
+
+Verificar que el contenedor esté corriendo:
+
+```bash
+docker ps
+```
+
+---
+
+## 🧱 3️⃣ Aplicar migraciones
+
+Esto crea automáticamente las tablas en PostgreSQL:
+
+tener en cuenta que esto es solo un comando por lo que si no sirve a la primera quitar " \ " y dejarla en una sola linea 
+```bash
+dotnet ef database update \
+--project src/EmprendeIA.Infrastructure \
+--startup-project src/EmprendeIA.Api
+```
+
+Si no tienes instalado `dotnet-ef`:
+
+```bash
+dotnet tool install --global dotnet-ef
+```
+
+---
+
+## 🚀 4️⃣ Ejecutar la API
+
+```bash
+dotnet run --project src/EmprendeIA.Api
+```
+
+La API estará disponible en:
+
+```
+http://localhost:5246
+```
+
+---
+
+## 📚 5️⃣ Swagger
+
+Abrir en el navegador:
+
+```
+http://localhost:5246/swagger
+```
+
+Desde ahí puedes probar:
+
+* Register
+* Login
+* Endpoints protegidos
+
+---
+
+## 🔐 Autenticación (JWT)
+
+1. Registrar usuario
+2. Hacer login
+3. Copiar el token
+4. En Swagger → botón **Authorize**
+5. Pegar:
+
+```
+Bearer TU_TOKEN_AQUI
+```
+
+---
+
+## 🏗 Arquitectura del Proyecto
+
+```
+Domain         → Entidades y reglas de negocio
+Application    → Casos de uso (MediatR)
+Infrastructure → Persistencia, JWT, Repositorios
+Api            → Controllers y configuración
+```
+
+Arquitectura basada en Clean Architecture + CQRS.
+
+---
+
+## 🛠 Problemas comunes
+
+### 🔹 Error con base de datos
+
+Reiniciar contenedores:
+
+```bash
+docker compose down -v
+docker compose up -d
+```
+
+Luego volver a ejecutar migraciones.
+
+---
+
+## 📌 Notas
+
+* No modificar el `ConnectionString` si se usa Docker.
+* El proyecto utiliza PostgreSQL 16 en contenedor.
+* JWT configurado para autenticación segura.
