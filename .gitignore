@@ -1,0 +1,63 @@
+# =========================
+# .NET
+# =========================
+bin/
+obj/
+*.user
+*.suo
+*.userprefs
+*.csproj.user
+*.dbmdl
+*.pdb
+*.cache
+*.log
+
+# =========================
+# Visual Studio
+# =========================
+.vs/
+.vscode/
+.idea/
+
+# =========================
+# Rider
+# =========================
+.idea/
+
+# =========================
+# OS Files
+# =========================
+.DS_Store
+Thumbs.db
+
+# =========================
+# Environment files
+# =========================
+.env
+.env.*
+appsettings.Development.json
+
+# =========================
+# Logs
+# =========================
+logs/
+*.log
+
+# =========================
+# Docker
+# =========================
+docker-data/
+postgres_data/
+*.tar
+
+# =========================
+# Swagger generated
+# =========================
+swagger.json
+swagger.yaml
+
+# =========================
+# Test Results
+# =========================
+TestResults/
+coverage/
