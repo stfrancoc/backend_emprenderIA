@@ -1,6 +1,7 @@
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using EmprendeIA.Application.Projects.Create;
+using Microsoft.AspNetCore.Authorization;
 
 namespace EmprendeIA.Api.Controllers;
 
@@ -31,5 +32,12 @@ public class ProjectsController : ControllerBase
     public IActionResult GetById(Guid id)
     {
         return Ok();
+    }
+
+    [HttpGet]
+    [Authorize]
+    public IActionResult GetProjects()
+    {
+        return Ok("Endpoint protegido funcionando 🚀");
     }
 }

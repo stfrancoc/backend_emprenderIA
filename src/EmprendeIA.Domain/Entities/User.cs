@@ -12,7 +12,7 @@ public class User
     public EntrepreneurProfile? EntrepreneurProfile { get; set; }
     public InvestorProfile? InvestorProfile { get; set; }
     public MentorProfile? MentorProfile { get; set; }
-
+    public ICollection<RefreshToken> RefreshTokens { get; set; } = new List<RefreshToken>();
     private User() { }  
 
     public User(string email, string passwordHash, string role)

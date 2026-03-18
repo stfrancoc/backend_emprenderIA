@@ -1,6 +1,8 @@
 namespace EmprendeIA.Domain.Interfaces;
+using EmprendeIA.Domain.Entities;
 
 public interface IJwtService
 {
-    string GenerateToken(Guid userId, string email, string role);
+    string GenerateToken(User user);
+    string GenerateRefreshToken();
 }

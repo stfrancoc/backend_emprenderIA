@@ -8,6 +8,12 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System.Text;
+using MediatR;
+using System.Reflection;
+using System.IdentityModel.Tokens.Jwt;
+
+JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();
+
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -77,7 +83,8 @@ builder.Services.AddScoped<IJwtService, JwtService>();
 builder.Services.AddMediatR(cfg =>
     cfg.RegisterServicesFromAssemblies(
         typeof(Program).Assembly,
-        typeof(AssemblyReference).Assembly
+        typeof(AssemblyReference).Assembly,
+        typeof(LoginUserCommandHandler).Assembly
     ));
 
 

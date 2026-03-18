@@ -13,6 +13,7 @@ public class ApplicationDbContext : DbContext
     public DbSet<EntrepreneurProfile> EntrepreneurProfiles { get; set; }
     public DbSet<InvestorProfile> InvestorProfiles { get; set; }
     public DbSet<MentorProfile> MentorProfiles { get; set; }
+    public DbSet<RefreshToken> RefreshTokens { get; set; }
     public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
         : base(options)
     {
