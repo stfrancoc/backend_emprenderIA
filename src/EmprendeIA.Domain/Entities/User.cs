@@ -1,4 +1,5 @@
 namespace EmprendeIA.Domain.Entities;
+using EmprendeIA.Domain.Profiles;
 
 public class User
 {
@@ -7,6 +8,10 @@ public class User
     public string PasswordHash { get; private set; } = string.Empty;
     public string Role { get; private set; } = string.Empty;
     public DateTime CreatedAt { get; private set; }
+
+    public EntrepreneurProfile? EntrepreneurProfile { get; set; }
+    public InvestorProfile? InvestorProfile { get; set; }
+    public MentorProfile? MentorProfile { get; set; }
 
     private User() { }  
 
