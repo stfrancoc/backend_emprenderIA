@@ -7,6 +7,7 @@ using EmprendeIA.Application.Projects.Update;
 using EmprendeIA.Application.Projects.Delete;
 using Microsoft.AspNetCore.Authorization;
 using System.Security.Claims;
+using EmprendeIA.Application.Projects.GenerateBmc;
 
 namespace EmprendeIA.Api.Controllers;
 
@@ -85,5 +86,12 @@ public class ProjectsController : ControllerBase
         if (!result) return NotFound("Proyecto no encontrado o no tienes permiso");
 
         return NoContent();
+    }
+
+    [HttpPost("{id}/generate-bmc")]
+    public async Task<IActionResult> GenerateBmc(Guid id)
+    {
+        var result = await _mediator.Send(new GenerateBmcCommand(id, GetUserId()));
+        return Ok(result);
     }
 }

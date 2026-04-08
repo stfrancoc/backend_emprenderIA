@@ -3,6 +3,7 @@ using EmprendeIA.Infrastructure.Repositories;
 using EmprendeIA.Infrastructure.Authentication;
 using EmprendeIA.Domain.Interfaces;
 using EmprendeIA.Application;
+using EmprendeIA.Infrastructure.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
@@ -56,6 +57,11 @@ builder.Services.AddSwaggerGen(options =>
     });
 });
 
+// =========================
+// IA SERVICE
+// =========================
+builder.Services.AddHttpClient<IAIService, EmprendeIA.Infrastructure.Services.AiService>();
+builder.Services.AddScoped<IAIService, EmprendeIA.Infrastructure.Services.AiService>();
 
 // =========================
 // DATABASE
