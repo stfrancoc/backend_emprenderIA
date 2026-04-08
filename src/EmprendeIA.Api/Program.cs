@@ -130,7 +130,19 @@ builder.Services.AddAuthorization();
 // APP PIPELINE
 // =========================
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowNextJS", policy =>
+    {
+        policy.WithOrigins("http://localhost:3000") // URL de tu frontend
+              .AllowAnyHeader()
+              .AllowAnyMethod();
+    });
+});
+
 var app = builder.Build();
+
+app.UseCors("AllowNextJS");
 
 if (app.Environment.IsDevelopment())
 {
