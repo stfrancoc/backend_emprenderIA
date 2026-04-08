@@ -8,11 +8,7 @@ namespace EmprendeIA.Infrastructure.Repositories;
 public class ProjectRepository : IProjectRepository
 {
     private readonly ApplicationDbContext _context;
-
-    public ProjectRepository(ApplicationDbContext context)
-    {
-        _context = context;
-    }
+    public ProjectRepository(ApplicationDbContext context) => _context = context;
 
     public async Task AddAsync(Project project)
     {
@@ -20,8 +16,21 @@ public class ProjectRepository : IProjectRepository
         await _context.SaveChangesAsync();
     }
 
-    public async Task<Project?> GetByIdAsync(Guid id)
+    public async Task<Project?> GetByIdAsync(Guid id) 
+        => await _context.Projects.FirstOrDefaultAsync(p => p.Id == id);
+
+    public async Task<IEnumerable<Project>> GetByOwnerIdAsync(Guid ownerId)
+        => await _context.Projects.Where(p => p.OwnerId == ownerId).ToListAsync();
+
+    public async Task UpdateAsync(Project project)
     {
-        return await _context.Projects.FirstOrDefaultAsync(p => p.Id == id);
+        _context.Projects.Update(project);
+        await _context.SaveChangesAsync();
+    }
+
+    public async Task DeleteAsync(Project project)
+    {
+        _context.Projects.Remove(project);
+        await _context.SaveChangesAsync();
     }
 }
