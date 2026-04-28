@@ -6,6 +6,8 @@ public record ProjectDto(
     Guid Id, 
     string Title, 
     string Description, 
+    string Stage,
+    string Status,
     DateTime CreatedAt,
     Guid OwnerId
 );

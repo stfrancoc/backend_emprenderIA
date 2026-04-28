@@ -15,11 +15,7 @@ public class UpdateProjectCommandHandler : IRequestHandler<UpdateProjectCommand,
         if (project == null || project.OwnerId != request.OwnerId)
             return false;
 
-        typeof(EmprendeIA.Domain.Projects.Project)
-            .GetProperty(nameof(project.Title))?.SetValue(project, request.Title);
-        
-        typeof(EmprendeIA.Domain.Projects.Project)
-            .GetProperty(nameof(project.Description))?.SetValue(project, request.Description);
+        project.Update(request.Title, request.Description);
 
         await _repository.UpdateAsync(project);
         return true;

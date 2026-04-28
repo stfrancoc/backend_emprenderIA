@@ -1,5 +1,7 @@
 using EmprendeIA.Application.Users.Register;
 using EmprendeIA.Application.Users.Login;
+using EmprendeIA.Application.Users.TwoFactor;
+using EmprendeIA.Application.Users.Profile;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -17,7 +19,7 @@ public class AuthController : ControllerBase
 {
     private readonly IMediator _mediator;
     private readonly ApplicationDbContext _context;
-private readonly IJwtService _jwtService;
+    private readonly IJwtService _jwtService;
 
     public AuthController(IMediator mediator, ApplicationDbContext context, IJwtService jwtService)
     {
@@ -37,8 +39,22 @@ private readonly IJwtService _jwtService;
     [HttpPost("login")]
     public async Task<IActionResult> Login(LoginUserCommand command)
     {
-        var token = await _mediator.Send(command);
-        return Ok(new { token });
+        var response = await _mediator.Send(command);
+
+        if (response.Requires2FA)
+        {
+            return Ok(new
+            {
+                requires2FA = true,
+                tempToken = response.TempToken
+            });
+        }
+
+        return Ok(new
+        {
+            accessToken = response.AccessToken,
+            refreshToken = response.RefreshToken
+        });
     }
 
     [HttpPost("refresh")]
@@ -62,16 +78,69 @@ private readonly IJwtService _jwtService;
 
     [HttpGet("me")]
     [Authorize]
-    public IActionResult Me()
+    public async Task<IActionResult> Me()
     {
-        var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-        var email = User.FindFirst(ClaimTypes.Email)?.Value;
-        var role = User.FindFirst(ClaimTypes.Role)?.Value;
+        var userIdStr = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        if (userIdStr == null) return Unauthorized();
+
+        var userId = Guid.Parse(userIdStr);
+        var profile = await _mediator.Send(new GetUserProfileQuery(userId));
+
+        if (profile == null) return NotFound();
+
+        return Ok(profile);
+    }
+
+    // =========================
+    // 2FA ENDPOINTS
+    // =========================
+
+    [HttpPost("2fa/setup")]
+    [Authorize]
+    public async Task<IActionResult> Setup2FA()
+    {
+        var userId = GetUserId();
+        var result = await _mediator.Send(new Setup2FACommand(userId));
+        return Ok(result);
+    }
+
+    [HttpPost("2fa/verify-setup")]
+    [Authorize]
+    public async Task<IActionResult> VerifySetup2FA([FromBody] Verify2FARequest request)
+    {
+        var userId = GetUserId();
+        var result = await _mediator.Send(new VerifySetup2FACommand(userId, request.Code));
+        return Ok(new { success = result });
+    }
+
+    [HttpPost("2fa/validate")]
+    public async Task<IActionResult> Validate2FA([FromBody] Validate2FARequest request)
+    {
+        var response = await _mediator.Send(new Validate2FACommand(request.TempToken, request.Code));
         return Ok(new
         {
-            userId,
-            email,
-            role
+            accessToken = response.AccessToken,
+            refreshToken = response.RefreshToken
         });
     }
+
+    [HttpPost("2fa/disable")]
+    [Authorize]
+    public async Task<IActionResult> Disable2FA([FromBody] Disable2FARequest request)
+    {
+        var userId = GetUserId();
+        var result = await _mediator.Send(new Disable2FACommand(userId, request.Password, request.Code));
+        return Ok(new { success = result });
     }
+
+    private Guid GetUserId()
+    {
+        var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        return Guid.Parse(userIdClaim!);
+    }
+}
+
+// Request DTOs for 2FA endpoints
+public record Verify2FARequest(string Code);
+public record Validate2FARequest(string TempToken, string Code);
+public record Disable2FARequest(string Password, string Code);

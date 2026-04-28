@@ -22,13 +22,20 @@ public class LoginUserCommandHandler : IRequestHandler<LoginUserCommand, LoginRe
     public async Task<LoginResponse> Handle(LoginUserCommand request, CancellationToken cancellationToken)
     {
         var user = await _context.Users
-            .FirstOrDefaultAsync(x => x.Email == request.Email);
+            .FirstOrDefaultAsync(x => x.Email == request.Email && x.IsActive);
 
         if (user == null)
             throw new Exception("Usuario no encontrado");
 
         if (!BCrypt.Net.BCrypt.Verify(request.Password, user.PasswordHash))
             throw new Exception("Credenciales inválidas");
+
+        // If 2FA is enabled, return temp token instead of full auth
+        if (user.Is2FAEnabled)
+        {
+            var tempToken = _jwtService.GenerateToken(user); // Short-lived token
+            return new LoginResponse("", "", true, tempToken);
+        }
 
         var accessToken = _jwtService.GenerateToken(user);
         var refreshToken = _jwtService.GenerateRefreshToken();

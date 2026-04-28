@@ -23,13 +23,20 @@ public class UserRepository : IUserRepository
     public async Task<User?> GetByEmailAsync(string email)
     {
         return await _context.Users
-            .FirstOrDefaultAsync(u => u.Email == email);
+            .FirstOrDefaultAsync(u => u.Email == email && u.IsActive);
     }
 
     public async Task<User?> GetByIdAsync(Guid id)
     {
         return await _context.Users
-            .Include(u => u.EntrepreneurProfile) 
-            .FirstOrDefaultAsync(u => u.Id == id);
+            .Include(u => u.EntrepreneurProfile)
+            .Include(u => u.UserProfile)
+            .FirstOrDefaultAsync(u => u.Id == id && u.IsActive);
+    }
+
+    public async Task UpdateAsync(User user)
+    {
+        _context.Users.Update(user);
+        await _context.SaveChangesAsync();
     }
 }

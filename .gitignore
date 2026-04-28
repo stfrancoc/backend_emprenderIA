@@ -11,6 +11,8 @@ obj/
 *.pdb
 *.cache
 *.log
+contexto.txt
+modelo_relacional.txt
 
 # =========================
 # Visual Studio

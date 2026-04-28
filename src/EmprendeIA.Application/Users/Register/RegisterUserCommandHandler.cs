@@ -24,6 +24,7 @@ public class RegisterUserCommandHandler : IRequestHandler<RegisterUserCommand, G
         var passwordHash = BCrypt.Net.BCrypt.HashPassword(request.Password);
 
         var user = new User(
+            request.Name,
             request.Email,
             passwordHash,
             request.Role

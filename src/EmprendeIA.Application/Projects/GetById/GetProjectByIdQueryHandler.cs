@@ -23,6 +23,8 @@ public class GetProjectByIdQueryHandler : IRequestHandler<GetProjectByIdQuery, P
             project.Id,
             project.Title,
             project.Description,
+            project.Stage.ToString(),
+            project.Status.ToString(),
             project.CreatedAt,
             project.OwnerId
         );

@@ -20,6 +20,8 @@ public class GetUserProjectsQueryHandler : IRequestHandler<GetUserProjectsQuery,
             p.Id,
             p.Title,
             p.Description,
+            p.Stage.ToString(),
+            p.Status.ToString(),
             p.CreatedAt,
             p.OwnerId
         ));
