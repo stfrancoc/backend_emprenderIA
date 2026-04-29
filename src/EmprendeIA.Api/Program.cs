@@ -12,6 +12,8 @@ using System.Text;
 using MediatR;
 using System.Reflection;
 using System.IdentityModel.Tokens.Jwt;
+using EmprendeIA.Api.Middleware;
+using EmprendeIA.Api.Swagger;
 
 JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();
 
@@ -41,20 +43,15 @@ builder.Services.AddSwaggerGen(options =>
         Description = "Ingresa el token JWT así: Bearer {tu token}"
     });
 
-    options.AddSecurityRequirement(new OpenApiSecurityRequirement
+    options.AddSecurityDefinition("X-API-KEY", new OpenApiSecurityScheme
     {
-        {
-            new OpenApiSecurityScheme
-            {
-                Reference = new OpenApiReference
-                {
-                    Type = ReferenceType.SecurityScheme,
-                    Id = "Bearer"
-                }
-            },
-            new string[] {}
-        }
+        Name = "X-API-KEY",
+        Type = SecuritySchemeType.ApiKey,
+        In = ParameterLocation.Header,
+        Description = "API key para endpoints internos del módulo IA"
     });
+
+    options.OperationFilter<SecurityRequirementsOperationFilter>();
 });
 
 // =========================
@@ -153,6 +150,8 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+app.UseMiddleware<InternalApiKeyMiddleware>();
 
 app.UseAuthentication();
 app.UseAuthorization();

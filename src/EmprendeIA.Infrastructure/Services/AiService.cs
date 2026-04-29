@@ -1,4 +1,5 @@
 using System.Net.Http.Json;
+using System.Text.Json;
 using EmprendeIA.Domain.Interfaces;
 using Microsoft.Extensions.Configuration;
 
@@ -17,10 +18,20 @@ public class AiService : IAIService
 
     public async Task<object> GenerateBmcAsync(object input)
     {
-        var response = await _httpClient.PostAsJsonAsync($"{_baseUrl}/ia/bmc/generate", input);
-        
+        var response = await _httpClient.PostAsJsonAsync(
+            $"{_baseUrl}/ia/bmc/generate",
+            input,
+            new JsonSerializerOptions
+            {
+                PropertyNamingPolicy = JsonNamingPolicy.SnakeCaseLower,
+                DictionaryKeyPolicy = JsonNamingPolicy.SnakeCaseLower
+            });
+
         if (!response.IsSuccessStatusCode)
-            throw new Exception("Error al conectar con el microservicio de IA");
+        {
+            var errorBody = await response.Content.ReadAsStringAsync();
+            throw new Exception($"Error al conectar con el microservicio de IA ({(int)response.StatusCode}): {errorBody}");
+        }
 
         return await response.Content.ReadFromJsonAsync<object>() ?? throw new Exception("Respuesta de IA vacía");
     }
