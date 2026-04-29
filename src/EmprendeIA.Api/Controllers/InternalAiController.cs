@@ -6,19 +6,20 @@ using Microsoft.AspNetCore.Mvc;
 namespace EmprendeIA.Api.Controllers;
 
 [ApiController]
+[EmprendeIA.Api.Swagger.InternalApiKey]
 [Route("internal/ai")]
 public class InternalAiController : ControllerBase
 {
-    private readonly IUserProfileRepository _userProfileRepository;
+    private readonly IUserRepository _userRepository;
     private readonly IProjectRepository _projectRepository;
     private readonly IProjectBmcRepository _projectBmcRepository;
 
     public InternalAiController(
-        IUserProfileRepository userProfileRepository,
+        IUserRepository userRepository,
         IProjectRepository projectRepository,
         IProjectBmcRepository projectBmcRepository)
     {
-        _userProfileRepository = userProfileRepository;
+        _userRepository = userRepository;
         _projectRepository = projectRepository;
         _projectBmcRepository = projectBmcRepository;
     }
@@ -30,17 +31,19 @@ public class InternalAiController : ControllerBase
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<ActionResult<InternalUserProfileResponse>> GetUserProfileById([FromRoute] Guid userId)
     {
-        var profile = await _userProfileRepository.GetByUserIdAsync(userId);
-        if (profile == null)
+        var user = await _userRepository.GetByIdAsync(userId);
+        if (user == null)
         {
             return NotFound();
         }
 
+        var profile = user.UserProfile;
+
         var response = new InternalUserProfileResponse(
-            profile.Bio ?? string.Empty,
-            profile.Skills ?? new List<string>(),
-            profile.Industries ?? new List<string>(),
-            profile.ExperienceLevel ?? string.Empty
+            profile?.Bio ?? string.Empty,
+            profile?.Skills ?? new List<string>(),
+            profile?.Industries ?? new List<string>(),
+            profile?.ExperienceLevel ?? string.Empty
         );
 
         return Ok(response);
