@@ -12,6 +12,7 @@ using System.Text;
 using MediatR;
 using System.Reflection;
 using System.IdentityModel.Tokens.Jwt;
+using EmprendeIA.Api.Middleware;
 
 JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();
 
@@ -54,6 +55,14 @@ builder.Services.AddSwaggerGen(options =>
             },
             new string[] {}
         }
+    });
+
+    options.AddSecurityDefinition("X-API-KEY", new OpenApiSecurityScheme
+    {
+        Name = "X-API-KEY",
+        Type = SecuritySchemeType.ApiKey,
+        In = ParameterLocation.Header,
+        Description = "API key para endpoints internos del módulo IA"
     });
 });
 
@@ -153,6 +162,8 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+app.UseMiddleware<InternalApiKeyMiddleware>();
 
 app.UseAuthentication();
 app.UseAuthorization();
