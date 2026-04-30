@@ -23,7 +23,7 @@ services:
       - "8000:8000"
     environment:
       - LLM_PROVIDER=gemini 
-      - LLM_API_KEY=AIzaSyD75vPkGaNykHi9Qqg19-i45L_tr-m3WXE
+      - LLM_API_KEY=
       - CONTEXT_SERVICE_BASE_URL=http://host.docker.internal:5246
       - CONTEXT_SERVICE_API_KEY=SUPER_INTERNAL_API_KEY
     extra_hosts:
