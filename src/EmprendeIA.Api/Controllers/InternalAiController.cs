@@ -40,10 +40,10 @@ public class InternalAiController : ControllerBase
         var profile = user.UserProfile;
 
         var response = new InternalUserProfileResponse(
-            profile?.Bio ?? string.Empty,
-            profile?.Skills ?? new List<string>(),
-            profile?.Industries ?? new List<string>(),
-            profile?.ExperienceLevel ?? string.Empty
+            string.IsNullOrWhiteSpace(profile?.Bio) ? "Sin biografía definida aún." : profile.Bio,
+            profile?.Skills ?? new List<string> { "General" },
+            profile?.Industries ?? new List<string> { "Emprendimiento" },
+            string.IsNullOrWhiteSpace(profile?.ExperienceLevel) ? "Nivel Inicial" : profile.ExperienceLevel
         );
 
         return Ok(response);

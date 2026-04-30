@@ -4,7 +4,7 @@ using EmprendeIA.Domain.Entities;
 
 namespace EmprendeIA.Application.Users.Profile;
 
-public class UpdateUserProfileCommandHandler : IRequestHandler<UpdateUserProfileCommand, bool>
+public class UpdateUserProfileCommandHandler : IRequestHandler<UpdateUserProfileCommand, UserProfileDto?>
 {
     private readonly IUserRepository _userRepository;
     private readonly IUserProfileRepository _profileRepository;
@@ -15,10 +15,10 @@ public class UpdateUserProfileCommandHandler : IRequestHandler<UpdateUserProfile
         _profileRepository = profileRepository;
     }
 
-    public async Task<bool> Handle(UpdateUserProfileCommand request, CancellationToken cancellationToken)
+    public async Task<UserProfileDto?> Handle(UpdateUserProfileCommand request, CancellationToken cancellationToken)
     {
         var user = await _userRepository.GetByIdAsync(request.UserId);
-        if (user == null) return false;
+        if (user == null) return null;
 
         // Update User.Name if provided
         if (!string.IsNullOrWhiteSpace(request.Name))
@@ -44,6 +44,17 @@ public class UpdateUserProfileCommandHandler : IRequestHandler<UpdateUserProfile
             await _profileRepository.UpdateAsync(profile);
         }
 
-        return true;
+        return new UserProfileDto(
+            user.Id,
+            user.Name,
+            user.Email,
+            user.Role,
+            user.Is2FAEnabled,
+            profile.Bio,
+            profile.Skills,
+            profile.Interests,
+            profile.ExperienceLevel,
+            profile.Industries
+        );
     }
 }

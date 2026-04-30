@@ -60,8 +60,8 @@ public class ProfileController : ControllerBase
         command.UserId = GetUserId();
         var result = await _mediator.Send(command);
 
-        if (!result) return NotFound("Usuario no encontrado");
+        if (result == null) return NotFound("Usuario no encontrado");
 
-        return NoContent();
+        return Ok(result);
     }
 }

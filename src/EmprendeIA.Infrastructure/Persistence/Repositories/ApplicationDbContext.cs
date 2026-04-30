@@ -12,6 +12,9 @@ public class ApplicationDbContext : DbContext
 
     public DbSet<UserProfile> UserProfiles { get; set; }
     public DbSet<ProjectBmc> ProjectBmcs { get; set; }
+    public DbSet<ProjectFinancialAnalysis> ProjectFinancialAnalyses { get; set; }
+    public DbSet<ChatSession> ChatSessions { get; set; }
+    public DbSet<ChatMessage> ChatMessages { get; set; }
     public DbSet<EntrepreneurProfile> EntrepreneurProfiles { get; set; }
     public DbSet<InvestorProfile> InvestorProfiles { get; set; }
     public DbSet<MentorProfile> MentorProfiles { get; set; }
@@ -47,6 +50,30 @@ public class ApplicationDbContext : DbContext
             entity.HasIndex(u => u.Email).IsUnique();
             entity.Property(u => u.Role).HasMaxLength(50);
             entity.Property(u => u.IsActive).HasDefaultValue(true);
+        });
+
+        // Configure Financial Analysis
+        modelBuilder.Entity<ProjectFinancialAnalysis>(entity =>
+        {
+            entity.HasKey(f => f.Id);
+            entity.HasOne(f => f.Project)
+                .WithOne(p => p.FinancialAnalysis)
+                .HasForeignKey<ProjectFinancialAnalysis>(f => f.ProjectId);
+        });
+
+        // Configure Chat
+        modelBuilder.Entity<ChatSession>(entity =>
+        {
+            entity.HasKey(s => s.Id);
+            entity.HasMany(s => s.Messages)
+                .WithOne()
+                .HasForeignKey(m => m.ChatSessionId)
+                .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        modelBuilder.Entity<ChatMessage>(entity =>
+        {
+            entity.HasKey(m => m.Id);
         });
     }
 }

@@ -8,6 +8,8 @@ using EmprendeIA.Application.Projects.Delete;
 using Microsoft.AspNetCore.Authorization;
 using System.Security.Claims;
 using EmprendeIA.Application.Projects.GenerateBmc;
+using EmprendeIA.Application.Projects.GenerateFinancialAnalysis;
+using EmprendeIA.Application.Projects.GetBmc;
 
 namespace EmprendeIA.Api.Controllers;
 
@@ -93,5 +95,20 @@ public class ProjectsController : ControllerBase
     {
         var result = await _mediator.Send(new GenerateBmcCommand(id, GetUserId()));
         return Ok(result);
+    }
+
+    [HttpPost("{id}/generate-financial")]
+    public async Task<IActionResult> GenerateFinancial(Guid id)
+    {
+        var result = await _mediator.Send(new GenerateFinancialAnalysisCommand(id, GetUserId()));
+        return Ok(result);
+    }
+
+    [HttpGet("{id}/bmc")]
+    public async Task<IActionResult> GetBmc(Guid id)
+    {
+        var bmc = await _mediator.Send(new GetProjectBmcQuery(id));
+        if (bmc == null) return NotFound();
+        return Ok(bmc);
     }
 }

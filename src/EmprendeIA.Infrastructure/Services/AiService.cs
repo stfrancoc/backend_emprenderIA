@@ -18,8 +18,23 @@ public class AiService : IAIService
 
     public async Task<object> GenerateBmcAsync(object input)
     {
+        return await PostToAiAsync("/ia/bmc/generate", input);
+    }
+
+    public async Task<object> GenerateFinancialAnalysisAsync(object input)
+    {
+        return await PostToAiAsync("/ia/financial/generate", input);
+    }
+
+    public async Task<object> ChatAsync(object input)
+    {
+        return await PostToAiAsync("/ia/assistant/chat", input);
+    }
+
+    private async Task<object> PostToAiAsync(string path, object input)
+    {
         var response = await _httpClient.PostAsJsonAsync(
-            $"{_baseUrl}/ia/bmc/generate",
+            $"{_baseUrl}{path}",
             input,
             new JsonSerializerOptions
             {

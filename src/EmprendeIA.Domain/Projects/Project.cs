@@ -18,6 +18,7 @@ public class Project
 
     // Navigation
     public ProjectBmc? Bmc { get; set; }
+    public ProjectFinancialAnalysis? FinancialAnalysis { get; set; }
 
     private Project() { }
 

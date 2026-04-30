@@ -12,6 +12,28 @@ services:
       - "5433:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    networks:
+      - emprendeia-net
+
+  ms-ia:
+    build: 
+      context: ../emprede-ia-microservice/ms-ia  # <-- Ajusta esta ruta a donde esté la carpeta de la IA
+    container_name: emprendeia_ms_ia
+    ports:
+      - "8000:8000"
+    environment:
+      - LLM_PROVIDER=gemini 
+      - LLM_API_KEY=AIzaSyD75vPkGaNykHi9Qqg19-i45L_tr-m3WXE
+      - CONTEXT_SERVICE_BASE_URL=http://host.docker.internal:5246
+      - CONTEXT_SERVICE_API_KEY=SUPER_INTERNAL_API_KEY
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    networks:
+      - emprendeia-net
+
+networks:
+  emprendeia-net:
+    driver: bridge
 
 volumes:
   postgres_data:

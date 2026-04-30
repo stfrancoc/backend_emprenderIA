@@ -78,6 +78,8 @@ builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IProjectRepository, ProjectRepository>();
 builder.Services.AddScoped<IUserProfileRepository, UserProfileRepository>();
 builder.Services.AddScoped<IProjectBmcRepository, ProjectBmcRepository>();
+builder.Services.AddScoped<IFinancialRepository, FinancialRepository>();
+builder.Services.AddScoped<IChatRepository, ChatRepository>();
 builder.Services.AddScoped<IJwtService, JwtService>();
 
 

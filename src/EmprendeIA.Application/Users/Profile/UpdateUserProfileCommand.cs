@@ -10,7 +10,7 @@ public record UpdateUserProfileCommand(
     List<string>? Interests,
     string? ExperienceLevel,
     List<string>? Industries
-) : IRequest<bool>
+) : IRequest<UserProfileDto?>
 {
     [JsonIgnore]
     public Guid UserId { get; set; }

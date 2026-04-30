@@ -58,10 +58,10 @@ public class AuthController : ControllerBase
     }
 
     [HttpPost("refresh")]
-    public async Task<IActionResult> Refresh([FromBody] string refreshToken)
+    public async Task<IActionResult> Refresh([FromBody] RefreshTokenRequest request)
     {
         var token = await _context.RefreshTokens
-            .FirstOrDefaultAsync(x => x.Token == refreshToken && !x.IsRevoked);
+            .FirstOrDefaultAsync(x => x.Token == request.RefreshToken && !x.IsRevoked);
 
         if (token == null || token.ExpiresAt < DateTime.UtcNow)
             return Unauthorized();
@@ -144,3 +144,4 @@ public class AuthController : ControllerBase
 public record Verify2FARequest(string Code);
 public record Validate2FARequest(string TempToken, string Code);
 public record Disable2FARequest(string Password, string Code);
+public record RefreshTokenRequest(string RefreshToken);
