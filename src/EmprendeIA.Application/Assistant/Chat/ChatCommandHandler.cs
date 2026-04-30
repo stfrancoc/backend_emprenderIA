@@ -16,8 +16,8 @@ public class ChatCommandHandler : IRequestHandler<ChatCommand, object>
     {
         var aiInput = new 
         {
-            ProjectId = request.ProjectId,
-            Messages = request.Messages
+            project_id = request.ProjectId?.ToString() ?? "general",
+            messages = request.Messages.Select(m => new { role = m.Role.ToLower(), content = m.Content }).ToList()
         };
 
         return await _aiService.ChatAsync(aiInput);
