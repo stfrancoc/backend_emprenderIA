@@ -10,6 +10,7 @@ using System.Security.Claims;
 using EmprendeIA.Application.Projects.GenerateBmc;
 using EmprendeIA.Application.Projects.GenerateFinancialAnalysis;
 using EmprendeIA.Application.Projects.GetBmc;
+using EmprendeIA.Application.Projects.UpdateBmc;
 
 namespace EmprendeIA.Api.Controllers;
 
@@ -110,5 +111,16 @@ public class ProjectsController : ControllerBase
         var bmc = await _mediator.Send(new GetProjectBmcQuery(id));
         if (bmc == null) return NotFound();
         return Ok(bmc);
+    }
+
+    [HttpPut("{id}/bmc")]
+    public async Task<IActionResult> UpdateBmc(Guid id, UpdateBmcCommand command)
+    {
+        if (id != command.ProjectId) return BadRequest("ID Mismatch");
+        
+        var result = await _mediator.Send(command with { UserId = GetUserId() });
+        if (!result) return NotFound("Proyecto no encontrado o no tienes permiso");
+        
+        return NoContent();
     }
 }

@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
 using System.Security.Claims;
 using EmprendeIA.Application.Projects.GenerateFinancialAnalysis;
+using EmprendeIA.Application.Projects.UpdateFinancialAnalysis;
 using EmprendeIA.Domain.Interfaces;
 
 namespace EmprendeIA.Api.Controllers;
@@ -41,8 +42,17 @@ public class FinancialController : ControllerBase
         var analysis = await _financialRepository.GetByProjectIdAsync(projectId);
         if (analysis == null) return NotFound();
         
-        // Verificar propiedad (puedes añadir lógica extra aquí)
-        
         return Ok(analysis);
+    }
+
+    [HttpPut("projects/{projectId}")]
+    public async Task<IActionResult> Update(Guid projectId, UpdateFinancialAnalysisCommand command)
+    {
+        if (projectId != command.ProjectId) return BadRequest("ID Mismatch");
+        
+        var result = await _mediator.Send(command with { UserId = GetUserId() });
+        if (!result) return NotFound("Análisis no encontrado o no tienes permiso");
+        
+        return NoContent();
     }
 }
