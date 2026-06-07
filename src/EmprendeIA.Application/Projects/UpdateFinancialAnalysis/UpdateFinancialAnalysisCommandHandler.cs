@@ -34,7 +34,11 @@ public class UpdateFinancialAnalysisCommandHandler : IRequestHandler<UpdateFinan
                 request.CostAnalysis,
                 request.BreakEvenAnalysis,
                 request.FundingRequirements,
-                request.KeyIndicators
+                request.KeyIndicators,
+                request.NetPresentValue,
+                request.InternalRateOfReturn,
+                request.BreakEvenUnits,
+                request.IsViable
             );
             await _financialRepository.AddAsync(analysis);
         }
@@ -45,7 +49,11 @@ public class UpdateFinancialAnalysisCommandHandler : IRequestHandler<UpdateFinan
                 request.CostAnalysis,
                 request.BreakEvenAnalysis,
                 request.FundingRequirements,
-                request.KeyIndicators
+                request.KeyIndicators,
+                request.NetPresentValue,
+                request.InternalRateOfReturn,
+                request.BreakEvenUnits,
+                request.IsViable
             );
             await _financialRepository.UpdateAsync(analysis);
         }

@@ -22,6 +22,7 @@ public class ApplicationDbContext : DbContext
     public DbSet<RefreshToken> RefreshTokens { get; set; }
     public DbSet<Product> Products { get; set; }
     public DbSet<ProductMetrics> ProductMetrics { get; set; }
+    public DbSet<ProjectMatch> ProjectMatches { get; set; }
 
     public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
         : base(options)
@@ -42,6 +43,14 @@ public class ApplicationDbContext : DbContext
 
         modelBuilder.Entity<Project>()
             .Property(p => p.Status)
+            .HasConversion<string>();
+
+        modelBuilder.Entity<Project>()
+            .Property(p => p.ProjectType)
+            .HasConversion<string>();
+
+        modelBuilder.Entity<Project>()
+            .Property(p => p.BusinessModelType)
             .HasConversion<string>();
 
         // Configure User table
@@ -114,6 +123,15 @@ public class ApplicationDbContext : DbContext
         modelBuilder.Entity<ProductMetrics>(entity =>
         {
             entity.HasKey(m => m.ProductId);
+        });
+
+        // Configure ProjectMatch
+        modelBuilder.Entity<ProjectMatch>(entity =>
+        {
+            entity.HasKey(m => m.Id);
+            entity.HasOne(m => m.Project)
+                .WithMany()
+                .HasForeignKey(m => m.ProjectId);
         });
     }
 }

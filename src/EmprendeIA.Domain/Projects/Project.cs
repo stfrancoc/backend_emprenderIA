@@ -9,6 +9,11 @@ public class Project
 
     public string Title { get; private set; } = string.Empty;
     public string Description { get; private set; } = string.Empty;
+    public string What { get; private set; } = string.Empty;
+    public string How { get; private set; } = string.Empty;
+    public string Why { get; private set; } = string.Empty;
+    public ProjectType ProjectType { get; private set; } = ProjectType.Producto;
+    public BusinessModelType BusinessModelType { get; private set; } = BusinessModelType.Necesidad;
     public ProjectStage Stage { get; private set; } = ProjectStage.Idea;
     public ProjectStatus Status { get; private set; } = ProjectStatus.Activo;
 
@@ -22,22 +27,32 @@ public class Project
 
     private Project() { }
 
-    public Project(Guid ownerId, string title, string description)
+    public Project(Guid ownerId, string title, string description, string what, string how, string why, ProjectType projectType, BusinessModelType businessModelType)
     {
         Id = Guid.NewGuid();
         OwnerId = ownerId;
         Title = title;
         Description = description;
+        What = what;
+        How = how;
+        Why = why;
+        ProjectType = projectType;
+        BusinessModelType = businessModelType;
         Stage = ProjectStage.Idea;
         Status = ProjectStatus.Activo;
         CreatedAt = DateTime.UtcNow;
         UpdatedAt = DateTime.UtcNow;
     }
 
-    public void Update(string title, string description)
+    public void Update(string title, string description, string what, string how, string why, ProjectType projectType, BusinessModelType businessModelType)
     {
         Title = title;
         Description = description;
+        What = what;
+        How = how;
+        Why = why;
+        ProjectType = projectType;
+        BusinessModelType = businessModelType;
         UpdatedAt = DateTime.UtcNow;
     }
 

@@ -4,6 +4,7 @@ using EmprendeIA.Infrastructure.Authentication;
 using EmprendeIA.Domain.Interfaces;
 using EmprendeIA.Application;
 using EmprendeIA.Infrastructure.Services;
+using EmprendeIA.Infrastructure.Persistence.Repositories;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
@@ -14,6 +15,8 @@ using System.Reflection;
 using System.IdentityModel.Tokens.Jwt;
 using EmprendeIA.Api.Middleware;
 using EmprendeIA.Api.Swagger;
+using EmprendeIA.Api.Hubs;
+using EmprendeIA.Api.Services;
 
 JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();
 
@@ -85,7 +88,10 @@ builder.Services.AddScoped<IProjectBmcRepository, ProjectBmcRepository>();
 builder.Services.AddScoped<IFinancialRepository, FinancialRepository>();
 builder.Services.AddScoped<IChatRepository, ChatRepository>();
 builder.Services.AddScoped<IProductRepository, ProductRepository>();
+builder.Services.AddScoped<IProjectMatchRepository, ProjectMatchRepository>();
 builder.Services.AddScoped<IJwtService, JwtService>();
+builder.Services.AddScoped<INotificationService, SignalRNotificationService>();
+builder.Services.AddSignalR();
 
 
 // =========================
@@ -127,6 +133,20 @@ builder.Services.AddAuthentication(options =>
         ValidAudience = jwtSettings["Audience"],
         IssuerSigningKey = new SymmetricSecurityKey(key)
     };
+
+    options.Events = new JwtBearerEvents
+    {
+        OnMessageReceived = context =>
+        {
+            var accessToken = context.Request.Query["access_token"];
+            var path = context.HttpContext.Request.Path;
+            if (!string.IsNullOrEmpty(accessToken) && path.StartsWithSegments("/hubs/notifications"))
+            {
+                context.Token = accessToken;
+            }
+            return Task.CompletedTask;
+        }
+    };
 });
 
 builder.Services.AddAuthorization();
@@ -142,7 +162,8 @@ builder.Services.AddCors(options =>
     {
         policy.WithOrigins("http://localhost:3000") // URL de tu frontend
               .AllowAnyHeader()
-              .AllowAnyMethod();
+              .AllowAnyMethod()
+              .AllowCredentials();
     });
 });
 
@@ -164,5 +185,6 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
+app.MapHub<NotificationHub>("/hubs/notifications");
 
 app.Run();

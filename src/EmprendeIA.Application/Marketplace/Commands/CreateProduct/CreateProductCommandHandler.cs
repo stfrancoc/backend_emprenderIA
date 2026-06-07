@@ -8,11 +8,13 @@ public class CreateProductCommandHandler : IRequestHandler<CreateProductCommand,
 {
     private readonly IProductRepository _productRepository;
     private readonly IProjectRepository _projectRepository;
+    private readonly IAIService _aiService;
 
-    public CreateProductCommandHandler(IProductRepository productRepository, IProjectRepository projectRepository)
+    public CreateProductCommandHandler(IProductRepository productRepository, IProjectRepository projectRepository, IAIService aiService)
     {
         _productRepository = productRepository;
         _projectRepository = projectRepository;
+        _aiService = aiService;
     }
 
     public async Task<Guid?> Handle(CreateProductCommand request, CancellationToken cancellationToken)
@@ -24,11 +26,37 @@ public class CreateProductCommandHandler : IRequestHandler<CreateProductCommand,
             return null;
         }
 
+        var category = request.Category;
+
+        if (category == ProductCategory.Otro)
+        {
+            try
+            {
+                var aiClassification = await _aiService.ClassifyProductAsync(request.Name, request.Description);
+                if (aiClassification != null)
+                {
+                    var cleanCategory = aiClassification.Category.ToLowerInvariant().Replace("í", "i").Trim();
+                    category = cleanCategory switch
+                    {
+                        "servicio" => ProductCategory.Servicio,
+                        "consultoria" => ProductCategory.Consultoria,
+                        "digital" => ProductCategory.Digital,
+                        _ => ProductCategory.Otro
+                    };
+                }
+            }
+            catch
+            {
+                // Fallback silently to ProductCategory.Otro if AI service fails
+                category = ProductCategory.Otro;
+            }
+        }
+
         var product = new Product(
             request.ProjectId,
             request.Name,
             request.Description,
-            request.Category,
+            category,
             request.Price,
             request.Images
         );

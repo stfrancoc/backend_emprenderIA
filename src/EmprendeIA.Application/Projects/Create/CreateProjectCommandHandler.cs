@@ -21,7 +21,12 @@ public class CreateProjectCommandHandler
         var project = new Project(
             request.OwnerId,
             request.Title,
-            request.Description
+            request.Description,
+            request.What,
+            request.How,
+            request.Why,
+            request.ProjectType,
+            request.BusinessModelType
         );
 
         await _repository.AddAsync(project);

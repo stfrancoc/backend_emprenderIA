@@ -15,7 +15,15 @@ public class UpdateProjectCommandHandler : IRequestHandler<UpdateProjectCommand,
         if (project == null || project.OwnerId != request.OwnerId)
             return false;
 
-        project.Update(request.Title, request.Description);
+        project.Update(
+            request.Title, 
+            request.Description, 
+            request.What, 
+            request.How, 
+            request.Why, 
+            request.ProjectType, 
+            request.BusinessModelType
+        );
 
         await _repository.UpdateAsync(project);
         return true;

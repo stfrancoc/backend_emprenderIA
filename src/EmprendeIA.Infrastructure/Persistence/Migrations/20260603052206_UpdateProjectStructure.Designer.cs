@@ -4,17 +4,20 @@ using System.Collections.Generic;
 using EmprendeIA.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
-namespace EmprendeIA.Infrastructure.Migrations
+namespace EmprendeIA.Infrastructure.Persistence.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260603052206_UpdateProjectStructure")]
+    partial class UpdateProjectStructure
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -453,9 +456,8 @@ namespace EmprendeIA.Infrastructure.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
-                    b.Property<string>("BusinessModelType")
-                        .IsRequired()
-                        .HasColumnType("text");
+                    b.Property<int>("BusinessModelType")
+                        .HasColumnType("integer");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
@@ -474,9 +476,8 @@ namespace EmprendeIA.Infrastructure.Migrations
                     b.Property<Guid>("OwnerId")
                         .HasColumnType("uuid");
 
-                    b.Property<string>("ProjectType")
-                        .IsRequired()
-                        .HasColumnType("text");
+                    b.Property<int>("ProjectType")
+                        .HasColumnType("integer");
 
                     b.Property<string>("Stage")
                         .IsRequired()
@@ -504,31 +505,6 @@ namespace EmprendeIA.Infrastructure.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Projects");
-                });
-
-            modelBuilder.Entity("EmprendeIA.Domain.Projects.ProjectMatch", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<Guid>("InvestorId")
-                        .HasColumnType("uuid");
-
-                    b.Property<decimal>("MatchScore")
-                        .HasColumnType("numeric");
-
-                    b.Property<Guid>("ProjectId")
-                        .HasColumnType("uuid");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ProjectId");
-
-                    b.ToTable("ProjectMatches");
                 });
 
             modelBuilder.Entity("EmprendeIA.Domain.Entities.ChatMessage", b =>
@@ -637,17 +613,6 @@ namespace EmprendeIA.Infrastructure.Migrations
                         .IsRequired();
 
                     b.Navigation("User");
-                });
-
-            modelBuilder.Entity("EmprendeIA.Domain.Projects.ProjectMatch", b =>
-                {
-                    b.HasOne("EmprendeIA.Domain.Projects.Project", "Project")
-                        .WithMany()
-                        .HasForeignKey("ProjectId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Project");
                 });
 
             modelBuilder.Entity("EmprendeIA.Domain.Entities.ChatSession", b =>

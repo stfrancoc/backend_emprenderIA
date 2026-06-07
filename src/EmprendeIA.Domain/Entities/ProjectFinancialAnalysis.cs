@@ -15,6 +15,12 @@ public class ProjectFinancialAnalysis
     public string FundingRequirements { get; private set; } = string.Empty;
     public string KeyIndicators { get; private set; } = string.Empty;
 
+    // Financial KPIs
+    public decimal NetPresentValue { get; private set; }
+    public decimal InternalRateOfReturn { get; private set; }
+    public int BreakEvenUnits { get; private set; }
+    public bool IsViable { get; private set; }
+
     public DateTime GeneratedAt { get; private set; }
     public DateTime UpdatedAt { get; private set; }
 
@@ -36,13 +42,21 @@ public class ProjectFinancialAnalysis
         string costAnalysis,
         string breakEvenAnalysis,
         string fundingRequirements,
-        string keyIndicators)
+        string keyIndicators,
+        decimal netPresentValue,
+        decimal internalRateOfReturn,
+        int breakEvenUnits,
+        bool isViable)
     {
         RevenueProjections = revenueProjections;
         CostAnalysis = costAnalysis;
         BreakEvenAnalysis = breakEvenAnalysis;
         FundingRequirements = fundingRequirements;
         KeyIndicators = keyIndicators;
+        NetPresentValue = netPresentValue;
+        InternalRateOfReturn = internalRateOfReturn;
+        BreakEvenUnits = breakEvenUnits;
+        IsViable = isViable;
         UpdatedAt = DateTime.UtcNow;
     }
 }

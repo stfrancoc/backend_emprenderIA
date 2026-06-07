@@ -9,5 +9,9 @@ public record UpdateFinancialAnalysisCommand(
     string CostAnalysis,
     string BreakEvenAnalysis,
     string FundingRequirements,
-    string KeyIndicators
+    string KeyIndicators,
+    decimal NetPresentValue,
+    decimal InternalRateOfReturn,
+    int BreakEvenUnits,
+    bool IsViable
 ) : IRequest<bool>;

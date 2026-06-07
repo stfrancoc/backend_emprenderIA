@@ -31,6 +31,36 @@ public class AiService : IAIService
         return await PostToAiAsync("/ia/assistant/chat", input);
     }
 
+    public async Task<ProductClassifyResponse?> ClassifyProductAsync(string name, string description)
+    {
+        var payload = new { name, description };
+        var result = await PostToAiAsync("/api/ai/classify-product", payload);
+        if (result == null) return null;
+
+        var jsonElement = (JsonElement)result;
+        return JsonSerializer.Deserialize<ProductClassifyResponse>(
+            jsonElement.GetRawText(),
+            new JsonSerializerOptions
+            {
+                PropertyNamingPolicy = JsonNamingPolicy.SnakeCaseLower
+            });
+    }
+
+    public async Task<CalculateMatchesResponse?> CalculateMatchesAsync(string projectId, string bmcText)
+    {
+        var payload = new { project_id = projectId, bmc_text = bmcText };
+        var result = await PostToAiAsync("/ia/matching/calculate", payload);
+        if (result == null) return null;
+
+        var jsonElement = (JsonElement)result;
+        return JsonSerializer.Deserialize<CalculateMatchesResponse>(
+            jsonElement.GetRawText(),
+            new JsonSerializerOptions
+            {
+                PropertyNamingPolicy = JsonNamingPolicy.SnakeCaseLower
+            });
+    }
+
     private async Task<object> PostToAiAsync(string path, object input)
     {
         var response = await _httpClient.PostAsJsonAsync(
@@ -48,6 +78,8 @@ public class AiService : IAIService
             throw new Exception($"Error al conectar con el microservicio de IA ({(int)response.StatusCode}): {errorBody}");
         }
 
-        return await response.Content.ReadFromJsonAsync<object>() ?? throw new Exception("Respuesta de IA vacía");
+        var doc = await response.Content.ReadFromJsonAsync<JsonElement?>();
+        if (doc == null) throw new Exception("Respuesta de IA vacía");
+        return doc.Value;
     }
 }

@@ -4,17 +4,20 @@ using System.Collections.Generic;
 using EmprendeIA.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
-namespace EmprendeIA.Infrastructure.Migrations
+namespace EmprendeIA.Infrastructure.Persistence.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260604081607_FixProjectSchema")]
+    partial class FixProjectSchema
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -453,9 +456,8 @@ namespace EmprendeIA.Infrastructure.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
-                    b.Property<string>("BusinessModelType")
-                        .IsRequired()
-                        .HasColumnType("text");
+                    b.Property<int>("BusinessModelType")
+                        .HasColumnType("integer");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
@@ -474,9 +476,8 @@ namespace EmprendeIA.Infrastructure.Migrations
                     b.Property<Guid>("OwnerId")
                         .HasColumnType("uuid");
 
-                    b.Property<string>("ProjectType")
-                        .IsRequired()
-                        .HasColumnType("text");
+                    b.Property<int>("ProjectType")
+                        .HasColumnType("integer");
 
                     b.Property<string>("Stage")
                         .IsRequired()

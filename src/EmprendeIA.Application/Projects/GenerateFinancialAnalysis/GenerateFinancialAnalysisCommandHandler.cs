@@ -80,7 +80,11 @@ public class GenerateFinancialAnalysisCommandHandler : IRequestHandler<GenerateF
             analysis.GetProperty("cost_analysis").GetString() ?? "",
             analysis.GetProperty("break_even_analysis").GetString() ?? "",
             analysis.GetProperty("funding_requirements").GetString() ?? "",
-            analysis.GetProperty("key_financial_indicators").GetString() ?? ""
+            analysis.GetProperty("key_financial_indicators").GetString() ?? "",
+            analysis.TryGetProperty("net_present_value", out var npv) ? npv.GetDecimal() : 0m,
+            analysis.TryGetProperty("internal_rate_of_return", out var irr) ? irr.GetDecimal() : 0m,
+            analysis.TryGetProperty("break_even_units", out var beu) ? beu.GetInt32() : 0,
+            analysis.TryGetProperty("is_viable", out var iv) && iv.GetBoolean()
         );
     }
 }
