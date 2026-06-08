@@ -3,6 +3,7 @@ using EmprendeIA.Domain.Projects;
 using EmprendeIA.Domain.Entities;
 using EmprendeIA.Domain.Profiles;
 using EmprendeIA.Domain.Entities.Marketplace;
+using EmprendeIA.Domain.Interfaces;
 
 namespace EmprendeIA.Infrastructure.Persistence;
 
@@ -23,6 +24,7 @@ public class ApplicationDbContext : DbContext
     public DbSet<Product> Products { get; set; }
     public DbSet<ProductMetrics> ProductMetrics { get; set; }
     public DbSet<ProjectMatch> ProjectMatches { get; set; }
+    public DbSet<BusinessPlan> BusinessPlans { get; set; }
 
     public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
         : base(options)
@@ -132,6 +134,16 @@ public class ApplicationDbContext : DbContext
             entity.HasOne(m => m.Project)
                 .WithMany()
                 .HasForeignKey(m => m.ProjectId);
+        });
+
+        // Configure BusinessPlan
+        modelBuilder.Entity<BusinessPlan>(entity =>
+        {
+            entity.HasKey(b => b.ProjectId);
+            entity.Property(b => b.Content).HasColumnType("text");
+            entity.HasOne(b => b.Project)
+                .WithOne(p => p.BusinessPlan)
+                .HasForeignKey<BusinessPlan>(b => b.ProjectId);
         });
     }
 }

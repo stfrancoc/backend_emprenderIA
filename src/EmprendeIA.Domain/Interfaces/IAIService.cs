@@ -7,4 +7,6 @@ public interface IAIService
     Task<object> ChatAsync(object input);
     Task<ProductClassifyResponse?> ClassifyProductAsync(string name, string description);
     Task<CalculateMatchesResponse?> CalculateMatchesAsync(string projectId, string bmcText);
+    Task<string> GenerateBusinessPlanMarkdownAsync(string bmcText);
+    Task<string> IngestRagDocumentAsync(string text, string source, string projectId);
 }

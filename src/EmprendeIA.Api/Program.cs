@@ -89,6 +89,7 @@ builder.Services.AddScoped<IFinancialRepository, FinancialRepository>();
 builder.Services.AddScoped<IChatRepository, ChatRepository>();
 builder.Services.AddScoped<IProductRepository, ProductRepository>();
 builder.Services.AddScoped<IProjectMatchRepository, ProjectMatchRepository>();
+builder.Services.AddScoped<IBusinessPlanRepository, BusinessPlanRepository>();
 builder.Services.AddScoped<IJwtService, JwtService>();
 builder.Services.AddScoped<INotificationService, SignalRNotificationService>();
 builder.Services.AddSignalR();

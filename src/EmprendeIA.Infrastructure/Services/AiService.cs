@@ -61,6 +61,32 @@ public class AiService : IAIService
             });
     }
 
+    public async Task<string> GenerateBusinessPlanMarkdownAsync(string bmcText)
+    {
+        var payload = new { bmc_text = bmcText };
+        var result = await PostToAiAsync("/ia/business-plan/generate-markdown", payload);
+        if (result == null) return string.Empty;
+
+        var jsonElement = (JsonElement)result;
+        if (jsonElement.TryGetProperty("content", out var contentProp))
+            return contentProp.GetString() ?? string.Empty;
+
+        return jsonElement.GetRawText();
+    }
+
+    public async Task<string> IngestRagDocumentAsync(string text, string source, string projectId)
+    {
+        var payload = new { text, source, project_id = projectId };
+        var result = await PostToAiAsync("/ia/rag/ingest", payload);
+        if (result == null) return string.Empty;
+
+        var jsonElement = (JsonElement)result;
+        if (jsonElement.TryGetProperty("document_id", out var idProp))
+            return idProp.GetString() ?? string.Empty;
+
+        return string.Empty;
+    }
+
     private async Task<object> PostToAiAsync(string path, object input)
     {
         var response = await _httpClient.PostAsJsonAsync(
@@ -82,4 +108,4 @@ public class AiService : IAIService
         if (doc == null) throw new Exception("Respuesta de IA vacía");
         return doc.Value;
     }
-}
+}

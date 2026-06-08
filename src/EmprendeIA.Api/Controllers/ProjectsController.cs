@@ -11,6 +11,11 @@ using EmprendeIA.Application.Projects.GenerateBmc;
 using EmprendeIA.Application.Projects.GenerateFinancialAnalysis;
 using EmprendeIA.Application.Projects.GetBmc;
 using EmprendeIA.Application.Projects.UpdateBmc;
+using EmprendeIA.Application.Projects.UploadDocument;
+using EmprendeIA.Application.Projects.GenerateBusinessPlan;
+using EmprendeIA.Application.Projects.GetBusinessPlan;
+using EmprendeIA.Application.Projects.UpdateBusinessPlan;
+
 
 namespace EmprendeIA.Api.Controllers;
 
@@ -123,4 +128,49 @@ public class ProjectsController : ControllerBase
         
         return NoContent();
     }
-}
+
+    // ── Document Upload ──────────────────────────────────────────────
+    [HttpPost("{id}/documents")]
+    [RequestSizeLimit(20 * 1024 * 1024)] // 20 MB max
+    public async Task<IActionResult> UploadDocument(Guid id, IFormFile file)
+    {
+        if (file == null || file.Length == 0)
+            return BadRequest("No se proporcionó un archivo válido.");
+
+        var allowed = new[] { ".pdf", ".txt", ".docx" };
+        var ext = Path.GetExtension(file.FileName).ToLowerInvariant();
+        if (!allowed.Contains(ext))
+            return BadRequest("Formato no soportado. Use PDF, TXT o DOCX.");
+
+        await using var stream = file.OpenReadStream();
+        var docId = await _mediator.Send(new UploadProjectDocumentCommand(
+            id, GetUserId(), stream, file.FileName));
+
+        return Ok(new { documentId = docId, message = "Documento indexado correctamente en el asistente IA." });
+    }
+
+    // ── Business Plan ────────────────────────────────────────────────
+    [HttpGet("{id}/business-plan")]
+    public async Task<IActionResult> GetBusinessPlan(Guid id)
+    {
+        var content = await _mediator.Send(new GetBusinessPlanQuery(id));
+        if (content == null) return NotFound();
+        return Ok(new { content });
+    }
+
+    [HttpPost("{id}/business-plan/generate")]
+    public async Task<IActionResult> GenerateBusinessPlan(Guid id)
+    {
+        var content = await _mediator.Send(new GenerateBusinessPlanCommand(id, GetUserId()));
+        return Ok(new { content });
+    }
+
+    [HttpPut("{id}/business-plan")]
+    public async Task<IActionResult> UpdateBusinessPlan(Guid id, [FromBody] UpdateBusinessPlanCommand command)
+    {
+        if (id != command.ProjectId) return BadRequest("ID Mismatch");
+        var result = await _mediator.Send(command with { UserId = GetUserId() });
+        if (!result) return NotFound("Proyecto no encontrado o sin permisos.");
+        return NoContent();
+    }
+}
