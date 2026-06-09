@@ -25,6 +25,9 @@ public class ApplicationDbContext : DbContext
     public DbSet<ProductMetrics> ProductMetrics { get; set; }
     public DbSet<ProjectMatch> ProjectMatches { get; set; }
     public DbSet<BusinessPlan> BusinessPlans { get; set; }
+    public DbSet<Milestone> Milestones { get; set; }
+    public DbSet<ForumTopic> ForumTopics { get; set; }
+    public DbSet<ForumReply> ForumReplies { get; set; }
 
     public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
         : base(options)
@@ -144,6 +147,46 @@ public class ApplicationDbContext : DbContext
             entity.HasOne(b => b.Project)
                 .WithOne(p => p.BusinessPlan)
                 .HasForeignKey<BusinessPlan>(b => b.ProjectId);
+        });
+
+        // Configure Milestone
+        modelBuilder.Entity<Milestone>(entity =>
+        {
+            entity.HasKey(m => m.Id);
+            entity.Property(m => m.Title).HasMaxLength(200).IsRequired();
+            entity.Property(m => m.Description).HasColumnType("text");
+            entity.HasOne(m => m.Project)
+                .WithMany()
+                .HasForeignKey(m => m.ProjectId);
+        });
+
+        // Configure ForumTopic
+        modelBuilder.Entity<ForumTopic>(entity =>
+        {
+            entity.HasKey(t => t.Id);
+            entity.Property(t => t.Title).HasMaxLength(300).IsRequired();
+            entity.Property(t => t.Content).HasColumnType("text").IsRequired();
+            entity.HasOne(t => t.User)
+                .WithMany()
+                .HasForeignKey(t => t.UserId);
+            entity.HasMany(t => t.Replies)
+                .WithOne(r => r.Topic)
+                .HasForeignKey(r => r.TopicId)
+                .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        // Configure ForumReply
+        modelBuilder.Entity<ForumReply>(entity =>
+        {
+            entity.HasKey(r => r.Id);
+            entity.Property(r => r.Content).HasColumnType("text").IsRequired();
+            entity.HasOne(r => r.Topic)
+                .WithMany(t => t.Replies)
+                .HasForeignKey(r => r.TopicId)
+                .OnDelete(DeleteBehavior.Cascade);
+            entity.HasOne(r => r.User)
+                .WithMany()
+                .HasForeignKey(r => r.UserId);
         });
     }
 }
