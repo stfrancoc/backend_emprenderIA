@@ -161,9 +161,9 @@ builder.Services.AddAuthorization();
 
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowNextJS", policy =>
+    options.AddPolicy("CorsPolicy", policy =>
     {
-        policy.WithOrigins("http://localhost:3000") // URL de tu frontend
+        policy.WithOrigins("http://localhost:3000")
               .AllowAnyHeader()
               .AllowAnyMethod()
               .AllowCredentials();
@@ -171,8 +171,6 @@ builder.Services.AddCors(options =>
 });
 
 var app = builder.Build();
-
-app.UseCors("AllowNextJS");
 
 if (app.Environment.IsDevelopment())
 {
@@ -182,8 +180,9 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+app.UseRouting();
+app.UseCors("CorsPolicy");
 app.UseMiddleware<InternalApiKeyMiddleware>();
-
 app.UseAuthentication();
 app.UseAuthorization();
 

@@ -13,7 +13,8 @@ public record UpdateProjectCommand(
     string How,
     string Why,
     ProjectType ProjectType,
-    BusinessModelType BusinessModelType
+    BusinessModelType BusinessModelType,
+    ProjectStage Stage
 ) : IRequest<bool>
 {
     [JsonIgnore]

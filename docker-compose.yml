@@ -1,6 +1,7 @@
 version: '3.9'
 
 services:
+  # 1. Base de datos PostgreSQL (Mantiene tu puerto 5433 y clave postgres123)
   postgres:
     image: postgres:16
     container_name: emprendeia_postgres
@@ -15,20 +16,52 @@ services:
     networks:
       - emprendeia-net
 
+  # 2. Microservicio de IA (FastAPI)
   ms-ia:
     build: 
-      context: ../emprede-ia-microservice/ms-ia  # <-- Ajusta esta ruta a donde esté la carpeta de la IA
+      context: ../emprede-ia-microservice/ms-ia
+      dockerfile: Dockerfile
     container_name: emprendeia_ms_ia
     ports:
       - "8000:8000"
     environment:
       - LLM_PROVIDER=gemini 
       - LLM_MODEL=gemini-3-flash-preview
-      - LLM_API_KEY=
-      - CONTEXT_SERVICE_BASE_URL=http://host.docker.internal:5246
+      - LLM_API_KEY=${LLM_API_KEY}  # Se inyecta desde el archivo .env de la raíz del backend
+      - CONTEXT_SERVICE_BASE_URL=http://host.docker.internal:5246  # Redireccionado a tu .NET nativo
       - CONTEXT_SERVICE_API_KEY=SUPER_INTERNAL_API_KEY
-    extra_hosts:
-      - "host.docker.internal:host-gateway"
+    depends_on:
+      - postgres
+    networks:
+      - emprendeia-net
+
+  # 3. Backend Principal (.NET 8 - El contexto es "." porque el compose está aquí)
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: emprendeia_backend
+    environment:
+      - ConnectionStrings__DefaultConnection=Host=postgres;Port=5432;Database=emprendeia_db;Username=postgres;Password=postgres123
+      - AiService__BaseUrl=http://ms-ia:8000
+    ports:
+      - "5244:5244"
+    depends_on:
+      - postgres
+      - ms-ia
+    networks:
+      - emprendeia-net
+
+  # 4. Frontend Web (Next.js 14)
+  frontend:
+    build:
+      context: ../frontend/frontend-emprenderia
+      dockerfile: Dockerfile
+    container_name: emprendeia_frontend
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
     networks:
       - emprendeia-net
 

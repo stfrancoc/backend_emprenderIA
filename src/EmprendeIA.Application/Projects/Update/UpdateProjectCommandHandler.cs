@@ -25,6 +25,9 @@ public class UpdateProjectCommandHandler : IRequestHandler<UpdateProjectCommand,
             request.BusinessModelType
         );
 
+        // Update stage if provided
+        project.SetStage(request.Stage);
+
         await _repository.UpdateAsync(project);
         return true;
     }
