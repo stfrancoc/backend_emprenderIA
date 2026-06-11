@@ -22,6 +22,14 @@ public class ProjectRepository : IProjectRepository
     public async Task<IEnumerable<Project>> GetByOwnerIdAsync(Guid ownerId)
         => await _context.Projects.Where(p => p.OwnerId == ownerId).ToListAsync();
 
+    public async Task<IEnumerable<Project>> GetByMinimumStageAsync(ProjectStage minStage)
+    {
+        // To avoid issues with enum-to-string conversions in EF Core queries,
+        // fetch and filter in memory. If dataset is large, replace with a translated query.
+        var all = await _context.Projects.ToListAsync();
+        return all.Where(p => p.Stage >= minStage).ToList();
+    }
+
     public async Task UpdateAsync(Project project)
     {
         _context.Projects.Update(project);

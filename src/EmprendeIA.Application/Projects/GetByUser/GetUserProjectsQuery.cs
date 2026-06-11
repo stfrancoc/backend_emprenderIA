@@ -17,4 +17,4 @@ public record ProjectDto(
     Guid OwnerId
 );
 
-public record GetUserProjectsQuery(Guid UserId) : IRequest<IEnumerable<ProjectDto>>;
+public record GetUserProjectsQuery(Guid UserId, string Role) : IRequest<IEnumerable<ProjectDto>>;

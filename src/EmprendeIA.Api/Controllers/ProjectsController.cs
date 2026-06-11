@@ -53,7 +53,9 @@ public class ProjectsController : ControllerBase
     [HttpGet]
     public async Task<IActionResult> GetMyProjects()
     {
-        var query = new GetUserProjectsQuery(GetUserId());
+        // Se extrae el rol de los claims del token de autorización
+        var userRole = User.FindFirst(ClaimTypes.Role)?.Value ?? "Entrepreneur";
+        var query = new GetUserProjectsQuery(GetUserId(), userRole);
         var projects = await _mediator.Send(query);
         return Ok(projects);
     }
@@ -173,4 +175,4 @@ public class ProjectsController : ControllerBase
         if (!result) return NotFound("Proyecto no encontrado o sin permisos.");
         return NoContent();
     }
-}
+}
