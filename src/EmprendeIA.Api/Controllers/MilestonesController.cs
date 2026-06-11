@@ -34,13 +34,27 @@ public class MilestonesController : ControllerBase
     [HttpPost]
     public async Task<IActionResult> CreateMilestone(Guid projectId, [FromBody] CreateMilestoneRequest request)
     {
-        var project = await _projectRepository.GetByIdAsync(projectId);
+        if (request == null)
+            return BadRequest("Solicitud de hito inválida.");
+
+        var effectiveProjectId = request.ProjectId != Guid.Empty ? request.ProjectId : projectId;
+        if (effectiveProjectId != projectId)
+            return BadRequest("El projectId de la ruta y del cuerpo no coinciden.");
+
+        var project = await _projectRepository.GetByIdAsync(effectiveProjectId);
         if (project == null)
             return NotFound("Project not found");
 
-        var milestone = new Milestone(projectId, request.Title, request.Description, request.DueDate);
+        if (string.IsNullOrWhiteSpace(request.Title))
+            return BadRequest("El título del hito es obligatorio.");
+
+        var dueDate = request.DueDate.Kind == DateTimeKind.Unspecified
+            ? DateTime.SpecifyKind(request.DueDate, DateTimeKind.Utc)
+            : request.DueDate;
+
+        var milestone = new Milestone(effectiveProjectId, request.Title.Trim(), request.Description?.Trim() ?? string.Empty, dueDate);
         await _repository.AddAsync(milestone);
-        return CreatedAtAction(nameof(GetMilestones), new { projectId }, milestone);
+        return CreatedAtAction(nameof(GetMilestones), new { projectId = effectiveProjectId }, milestone);
     }
 
     [HttpPut("{milestoneId}/toggle")]
@@ -61,6 +75,7 @@ public class MilestonesController : ControllerBase
 
 public class CreateMilestoneRequest
 {
+    public Guid ProjectId { get; set; }
     public string Title { get; set; } = string.Empty;
     public string Description { get; set; } = string.Empty;
     public DateTime DueDate { get; set; }
